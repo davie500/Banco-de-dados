@@ -3,6 +3,7 @@ import { connection } from "../db.js"
 import { createUsuario, returnUsuario, updateUsuarioSchema } from "../schemas/usuario.schemas.js"
 import { validateDataMiddleware } from "../middleware/validateData.middleware.js"
 import jwt from "jsonwebtoken"
+import {hashSync} from "bcryptjs"
 const dadosUsuario = [
     "name","email","password"
 ]
@@ -37,7 +38,9 @@ userRoutes.post("",validateDataMiddleware(createUsuario), async(req,res)=>{
     const user = req.body
   
     const text = 'INSERT INTO usuarios( name, email, password) VALUES($1, $2,$3) RETURNING *'
-    const hash = btoa(user.password)
+    // const hash = btoa(user.password)
+    const hash = hashSync(user.password,9)
+
     const values = [user.name,user.email,hash]
     const query = await  connection.query(text,values)
     // await pool.end()
